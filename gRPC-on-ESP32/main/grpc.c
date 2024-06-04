@@ -20,11 +20,9 @@
 #include <netdb.h>
 #include "esp_log.h"
 
-
 #if CONFIG_MBEDTLS_CERTIFICATE_BUNDLE
-    #include "esp_crt_bundle.h"
+#include "esp_crt_bundle.h"
 #endif
-
 
 // ====================================================================
 // DEFINES & MACROS
@@ -266,7 +264,7 @@ bool grpc_call_proc(char *path, char *proc, uint8_t *data, uint32_t len)
         vTaskDelay(10);
     }
     // printf("bools.message_pending = true\n");
-    bools .message_pending = true;
+    bools.message_pending = true;
 
     memcpy(buffer_send.buf + MESSAGE_PREFIX_SIZE, data, len);
     buffer_send.len = len;
@@ -399,7 +397,6 @@ static void handle_disconnect()
 static void http2_task()
 {
     ESP_LOGI(TAG, "Entered http2 task");
-
 
     for (;;)
     {

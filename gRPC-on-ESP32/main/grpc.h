@@ -29,8 +29,8 @@ typedef struct
 
 typedef struct
 {
-    const char* ca;
-    const char* uri;
+    const char *ca;
+    const char *uri;
 } grpc_conn_data_t;
 
 // https://grpc.github.io/grpc/core/md_doc_statuscodes.html
@@ -62,9 +62,9 @@ bool grpc_connect();
 bool grpc_connected();
 bool grpc_wait_for_connection(int timeout_ms);
 bool gprc_send_message_pending();
-bool grpc_call_proc(char* path, char* proc, uint8_t* data, uint32_t len);
-bool grpc_ping(int timeout_ms, int64_t* _ping_time);
-const char* grpc_status_code_to_str(GRPCStatusCode sc);
+bool grpc_call_proc(char *path, char *proc, uint8_t *data, uint32_t len);
+bool grpc_ping(int timeout_ms, int64_t *_ping_time);
+const char *grpc_status_code_to_str(GRPCStatusCode sc);
 
-uint8_t* grpc_get_buffer_data(void);
+uint8_t *grpc_get_buffer_data(void);
 size_t grpc_get_buffer_length(void);

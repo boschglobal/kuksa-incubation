@@ -30,23 +30,21 @@
 // ------------------------------------------------------------------------------------------
 static const char *TAG = "MAIN";
 bool session_test = false;
-const char* grpc_uri = "https://<grpc-server_ip:port>";
+const char *grpc_uri = "https://<grpc-server_ip:port>";
 
 // ------------------------------------------------------------------------------------------
 
-
-// Get Reqeust 
+// Get Reqeust
 // ------------------
 #define MESSAGEPB_PATH "/kuksa.val.v1.VAL"
 #define MESSAGEPB_REQUEST "Get"
 // ------------------
 
-// Set Reqeust 
+// Set Reqeust
 // ------------------
 // #define MESSAGEPB_PATH "/kuksa.val.v1.VAL"
 // #define MESSAGEPB_REQUEST "Set"
 // ------------------
-
 
 void app_main()
 {
@@ -87,26 +85,26 @@ void app_main()
     grpc_connect();
 
     // @TEST: GRPC
-    for(;;)
+    for (;;)
     {
         static bool pinged = false;
         static bool conn_prior = false;
 
         bool conn = grpc_connected();
 
-        if(conn && !conn_prior)
+        if (conn && !conn_prior)
         {
             pinged = true;
             session_test = false;
         }
 
-        if(conn)
+        if (conn)
         {
-            if(!pinged)
+            if (!pinged)
             {
                 int64_t rtt = 0;
                 bool ret = grpc_ping(1000, &rtt);
-                if(ret)
+                if (ret)
                 {
                     pinged = true;
                     int rtt_ms = rtt / 1000;
@@ -114,68 +112,61 @@ void app_main()
                 }
             }
 
-            if(!session_test)
+            if (!session_test)
             {
-
-            
- 
 
                 // -------------------------------------------------------------------------------------------------------
                 // See get request example below:
                 // -------------------------------------------------------------------------------------------------------
 
                 uint8_t buffer[256];
-                size_t message_length; 
+                size_t message_length;
 
-
-                
                 EntryRequest message = {
                     .path = "Vehicle.Speed",
                     .view = kuksa_val_v1_View_VIEW_CURRENT_VALUE,
                 };
 
-                
                 kuksa_val_v1_EntryRequest entry_request = init_entry_request(&message);
 
-
                 kuksa_val_v1_GetRequest get_request;
-                get_request.entries.funcs.encode = encode_entries_callback; 
-                get_request.entries.arg = &entry_request;  
+                get_request.entries.funcs.encode = encode_entries_callback;
+                get_request.entries.arg = &entry_request;
 
                 pb_ostream_t stream = pb_ostream_from_buffer(buffer, sizeof(buffer));
 
                 // Encode the GetRequest
-                if (!pb_encode(&stream, kuksa_val_v1_GetRequest_fields, &get_request)) {
+                if (!pb_encode(&stream, kuksa_val_v1_GetRequest_fields, &get_request))
+                {
                     ESP_LOGE(TAG, "Encoding failed: %s", PB_GET_ERROR(&stream));
-                    free(entry_request.path.arg);  
+                    free(entry_request.path.arg);
                     return;
                 }
 
                 message_length = stream.bytes_written;
                 ESP_LOGI(TAG, "Encoded GetRequest with length %zu bytes\n", message_length);
 
-
                 free(entry_request.path.arg);
 
-                
-                grpc_call_proc(MESSAGEPB_PATH,MESSAGEPB_REQUEST, buffer, message_length);
+                grpc_call_proc(MESSAGEPB_PATH, MESSAGEPB_REQUEST, buffer, message_length);
 
                 vTaskDelay(2000);
 
-                uint8_t* resp_buf = grpc_get_buffer_data(); // Buffer for response
+                uint8_t *resp_buf = grpc_get_buffer_data();     // Buffer for response
                 size_t resp_buf_len = grpc_get_buffer_length(); // Populate with actual response length
-                
 
-                if (decode_GetResponse(resp_buf, resp_buf_len)) {
+                if (decode_GetResponse(resp_buf, resp_buf_len))
+                {
                     ESP_LOGI(TAG, "Decoding was successful");
-                } else {
+                }
+                else
+                {
                     ESP_LOGE(TAG, "Decoding failed");
                 }
 
                 // -------------------------------------------------------------------------------------------------------
                 // See set request example below:
                 // -------------------------------------------------------------------------------------------------------
-
 
                 // uint8_t buffer[128];  // Buffer to hold the encoded data
                 // size_t message_length;  // Variable to store the message length after encoding
@@ -193,8 +184,6 @@ void app_main()
                 // log_buffer_content(buffer, message_length);
 
                 // grpc_call_proc(MESSAGEPB_PATH,MESSAGEPB_REQUEST, buffer, message_length);
-
-
 
                 session_test = true;
                 conn_prior = conn;

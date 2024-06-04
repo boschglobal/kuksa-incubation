@@ -40,7 +40,7 @@ for URL in "${PROTO_FILES[@]}"; do
 done
 
 # Define CMake configuration and overwrite
-CMAKE_CONFIG='idf_component_register(SRCS 
+CMAKE_CONFIG='idf_component_register(SRCS
                     "pb_common.c"
                     "pb_encode.c"
                     "pb_decode.c"

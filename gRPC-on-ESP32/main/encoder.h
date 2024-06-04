@@ -21,13 +21,12 @@
 #include "generated/val.pb.h"
 #include "generated/types.pb.h"
 
-typedef struct 
+typedef struct
 {
     char *path;
     kuksa_val_v1_View view;
-    //kuksa_val_v1_Field *field;
+    // kuksa_val_v1_Field *field;
 } EntryRequest;
-
 
 void log_buffer_content(const uint8_t *buffer, size_t length);
 bool encode_string(pb_ostream_t *stream, const pb_field_t *field, void *const *arg);
@@ -38,7 +37,6 @@ bool encode_get_request(kuksa_val_v1_GetRequest *request, uint8_t *buffer, size_
 kuksa_val_v1_EntryRequest init_entry_request(EntryRequest *req);
 bool callback_string_encoder(pb_ostream_t *stream, const pb_field_t *field, void *const *arg);
 bool encode_entries_callback(pb_ostream_t *stream, const pb_field_t *field, void *const *arg);
-
 
 kuksa_val_v1_Datapoint create_datapoint(float value);
 kuksa_val_v1_DataEntry create_data_entry(const char *path, kuksa_val_v1_Datapoint datapoint);
