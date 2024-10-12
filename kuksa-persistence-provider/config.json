@@ -1,0 +1,14 @@
+{
+    "restore-only": [
+        "Vehicle.Speed",
+        "Vehicle.Engine.RPM"
+    ],
+    "restore-and-watch": [
+        "Vehicle.D",
+        "Vehicle.X"
+    ],
+    "state-storage": {
+        "type": "file",
+        "path": "state.json"
+    }
+}
