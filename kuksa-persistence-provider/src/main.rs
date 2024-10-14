@@ -1,5 +1,16 @@
+/********************************************************************************
+* Copyright (c) 2024 Contributors to the Eclipse Foundation
+*
+* This program and the accompanying materials are made available under the
+* terms of the Apache License 2.0 which is available at
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* SPDX-License-Identifier: Apache-2.0
+********************************************************************************/
 
-use std::path::PathBuf;
+mod storage;
+
+use std::{path::PathBuf};
 use clap::Parser;
 use tinyjson::JsonValue;
 
@@ -34,6 +45,18 @@ fn main() {
 
     let parsed: JsonValue = config_str.parse().unwrap();
     println!("Parsed: {:?}", parsed);
+
+    match parsed["state-storage"]["type"].get::<String>().unwrap().as_str() {
+            "file" => {
+                println!("File Storage");
+                let mut _storage = storage::FileStorage::new(&parsed["state-storage"]);
+            },
+            _ => {
+                eprintln!("Error: state storage type is invalid");
+                std::process::exit(1);
+            }
+        }
+
 
 
 
