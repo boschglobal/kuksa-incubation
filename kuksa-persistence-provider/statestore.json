@@ -1,0 +1,9 @@
+
+{
+    "Vehicle.VehicleIdentification.VIN": {
+        "value": "DEADBEEF"  
+    },
+    "Vehicle.VehicleIdentification.VehicleInteriorColor": {
+        "value": "Black"
+    }
+}
