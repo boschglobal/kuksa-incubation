@@ -9,10 +9,17 @@
 ********************************************************************************/
 
 mod storage;
+mod kuksaconnector;
 
-use std::{path::PathBuf};
+use storage::Storage;
+
+use std::{path::PathBuf,env};
 use clap::Parser;
 use tinyjson::JsonValue;
+
+use tokio;
+
+use log;
 
 #[derive(Parser)]
 #[command(version, about, long_about = None)]
@@ -26,39 +33,51 @@ struct CmdLine {
     debug: u8,
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
+    if env::var("RUST_LOG").is_err() {
+        env::set_var("RUST_LOG", "info")
+    }
+    env_logger::init();
+    
+
     let args = CmdLine::parse();
 
     let config = args.config.unwrap_or_else(|| PathBuf::from("config.json"));
     
     //Check config exists
     if !config.exists() {
-        eprintln!("Error: Can not find configuration at {}", config.display());
+        log::error!("Error: Can not find configuration at {}", config.display());
         std::process::exit(1);
     }
 
-    println!("Reading configuration from: {}", config.display());
+    log::info!("Reading configuration from: {}", config.display());
     // Reading configuration file into a string
     let config_str = std::fs::read_to_string(config).unwrap();
 
-    println!("Configuration: {}", config_str);
+    log::debug!("Configuration file content: {}", config_str);
 
     let parsed: JsonValue = config_str.parse().unwrap();
-    println!("Parsed: {:?}", parsed);
+    log::debug!("Parsed JSON data structure: {:?}", parsed);
 
-    match parsed["state-storage"]["type"].get::<String>().unwrap().as_str() {
+    let mut _storage = match parsed["state-storage"]["type"].get::<String>().unwrap().as_str() {
             "file" => {
-                println!("File Storage");
-                let mut _storage = storage::FileStorage::new(&parsed["state-storage"]);
+                storage::FileStorage::new(&parsed["state-storage"])
             },
             _ => {
-                eprintln!("Error: state storage type is invalid");
+                log::error!("Error: state storage type is invalid");
                 std::process::exit(1);
             }
+        };
+
+        let kuksa_client = kuksaconnector::create_kuksa_client("grpc://127.0.01:55556");
+
+        let vec: &Vec<_> = parsed["restore-only"] .get().unwrap();
+        for vsspath in vec {
+            log::info!("Restoring VSS signal: {}", vsspath.get::<String>().unwrap());
+            kuksaconnector::get_from_storage_and_set(&_storage, &kuksa_client, vsspath.get::<String>().unwrap()).await;
         }
 
 
 
-
-    println!("Hello, world!");
 }

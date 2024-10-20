@@ -1,14 +1,14 @@
 {
     "restore-only": [
-        "Vehicle.Speed",
-        "Vehicle.Engine.RPM"
+        "Vehicle.VehicleIdentification.VIN",
+        "Vehicle.VehicleIdentification.VehicleInteriorColor"
     ],
     "restore-and-watch": [
-        "Vehicle.D",
-        "Vehicle.X"
+        "Vehicle.Cabin.Infotainment.Media.Volume",
+        "Vehicle.Cabin.Infotainment.HMI.TemperatureUnit"
     ],
     "state-storage": {
         "type": "file",
-        "path": "state.json"
+        "path": "statestore.json"
     }
 }

@@ -14,13 +14,12 @@ pub mod filestorage;
 pub use filestorage::FileStorage;
 use tinyjson::JsonValue;
 
-trait Storage {
+pub trait Storage {
     // Associated function signature; `Self` refers to the implementor type.
     fn new(config: &JsonValue) -> Self;
 
     // Method signatures; these will return a string.
-    fn get(&self, vsspath: &'static str) -> &'static str;
+    fn get(&self, vsspath: &str) -> Option<&str>;
     
-    fn set(&self, vsspath: &'static str, vssvalue: &'static str) -> Result<(), ()>;
-
+    fn set(&self, vsspath: &str, vssvalue: &'static str) -> Result<(), ()>;
 }
