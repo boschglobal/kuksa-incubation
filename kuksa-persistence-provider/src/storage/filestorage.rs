@@ -16,7 +16,6 @@ use std::collections::HashMap;
 use log;
 
 pub struct FileStorage {
-    storagefile: String,
     state: JsonValue,
 }
 
@@ -30,9 +29,9 @@ impl Storage for FileStorage {
                 println!("Reading storage from {}", path);
                 let config_str = std::fs::read_to_string(&path).unwrap();
                 let state = config_str.parse().unwrap();
-                FileStorage { storagefile: path, state: state }
+                FileStorage { state }
             }
-            _ => {
+            _ => { 
                 log::error!("Error: file storage path is invalid");
                 std::process::exit(1);
             }
@@ -49,11 +48,12 @@ impl Storage for FileStorage {
 
         if entry.is_some() && entry.unwrap().contains_key("value") {
             let value = entry.unwrap()["value"].get::<String>();
-            if value.is_some() {
-                return Some(value.unwrap());
+            
+            if let Some(v) = value {
+                return Some(v);
             }
         }
-        return None;
+        None
     }
 
     fn set(&self, vsspath: &str, vssvalue: &'static str) -> Result<(), ()> {
@@ -64,7 +64,5 @@ impl Storage for FileStorage {
 }
 
 impl FileStorage {
-    pub fn get_storagefile(&self) -> &String {
-        &self.storagefile
-    }
+
 }

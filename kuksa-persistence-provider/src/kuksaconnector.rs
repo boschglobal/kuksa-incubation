@@ -1,8 +1,5 @@
 use crate::storage;
 
-use regex;
-use prost_types::Timestamp;
-
 use std::time::SystemTime;
 use std::collections::HashMap;
 
@@ -11,7 +8,6 @@ use kuksa::proto as proto;
 //use kuksa::proto::v1::{datapoint::Value, DataType, Datapoint};
 
 use std::sync::{Arc, Mutex};
-use log;
 
 #[derive(Debug)]
 pub struct ParseError {}
@@ -31,7 +27,7 @@ pub async fn get_from_storage_and_set(storage: &impl storage::Storage, kuksa_cli
             log::warn!("No value for VSS signal: {} stored", vsspath);
             return;
         }
-    };
+    }; 
     
     /*
     let data_value = try_into_data_value(
@@ -68,7 +64,6 @@ pub async fn get_from_storage_and_set(storage: &impl storage::Storage, kuksa_cli
             log::warn!("Error: Could not set value for VSS signal: {}, Errors: {msg:?}", vsspath);
         }
     };
-    log::debug!("Got {} from storage  for {}" ,value, vsspath);
 }
 
 

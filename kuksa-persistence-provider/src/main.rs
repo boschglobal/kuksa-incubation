@@ -17,9 +17,6 @@ use std::{path::PathBuf,env};
 use clap::Parser;
 use tinyjson::JsonValue;
 
-use tokio;
-
-use log;
 
 #[derive(Parser)]
 #[command(version, about, long_about = None)]
