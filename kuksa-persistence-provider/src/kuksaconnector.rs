@@ -1,3 +1,13 @@
+/********************************************************************************
+* Copyright (c) 2024 Contributors to the Eclipse Foundation
+*
+* This program and the accompanying materials are made available under the
+* terms of the Apache License 2.0 which is available at
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* SPDX-License-Identifier: Apache-2.0
+********************************************************************************/
+
 use crate::storage;
 
 use std::time::SystemTime;
@@ -29,41 +39,72 @@ pub async fn get_from_storage_and_set(storage: &impl storage::Storage, kuksa_cli
         }
     }; 
     
-    /*
-    let data_value = try_into_data_value(
-        value,
-        proto::v1::DataType::String).unwrap_or({log::error!("Error: Could not parse value {} as required datatype", value);return;});
- */
-    let data_value = try_into_data_value(
-    value,
-    proto::v1::DataType::String).unwrap();
-    
-    //let ts = prost_types::protobuf::Timestamp::from(SystemTime::now());
-    let ts = prost_types::Timestamp::from(SystemTime::now());
 
-    //kuksa_client.lock().unwrap().set_current_values(datapoints)
-    let datapoints = HashMap::from([(
-        vsspath.to_string().clone(),
-        proto::v1::Datapoint {
-            timestamp: Some(ts),
-            value: Some(data_value),
-            },
-    )]);
-
-    match kuksa_client.lock().unwrap().set_current_values(datapoints).await {
-        Ok(_) => {
-            log::debug!("Succes setting {} to {}", vsspath, value);
-        }
+    //Figure out metadata:
+    let datapoint_entries = match kuksa_client.lock().unwrap().get_metadata(vec![vsspath]).await {
+        Ok(data_entries) => Some(data_entries),
         Err(kuksa::Error::Status(status)) => {
-            log::warn!("Error: Could not set value for VSS signal: {}, Status: {}", vsspath, &status);
+            log::warn!("Error: Could not get metadata for VSS signal: {}, Status: {}", vsspath, &status);
+            None
         }
         Err(kuksa::Error::Connection(msg)) => {
-            log::warn!("Connection Error: Could not set value for VSS signal: {}, Reason: {}", vsspath, &msg);
+            log::warn!("Connection Error: Could not get metadata for VSS signal: {}, Reason: {}", vsspath, &msg);
+            None
         }
         Err(kuksa::Error::Function(msg)) => {
-            log::warn!("Error: Could not set value for VSS signal: {}, Errors: {msg:?}", vsspath);
+            log::warn!("Error: Could not get metadata for VSS signal: {}, Errors: {msg:?}", vsspath);
+            None
         }
     };
+    
+    if datapoint_entries.is_none() {
+        return;
+    }
+
+    /* We can only have one match, as we query only one path (user entering branch
+     * in config is considered dumb) */
+    if let Some(entries) = datapoint_entries {
+        if let Some(metadata) = &entries.first().unwrap().metadata {
+            let data_value = try_into_data_value(
+                value,
+                proto::v1::DataType::from_i32(metadata.data_type)
+                    .unwrap(),
+            );
+            if data_value.is_err() {
+                log::warn!(
+                    "Could not parse \"{}\" as {:?}",
+                    value,
+                    proto::v1::DataType::from_i32(metadata.data_type)
+                        .unwrap()
+                );
+                return;
+            }
+
+            let ts = prost_types::Timestamp::from(SystemTime::now());
+            let datapoints = HashMap::from([(
+                vsspath.to_string().clone(),
+                proto::v1::Datapoint {
+                    timestamp: Some(ts),
+                    value: Some(data_value.unwrap()),
+                },
+            )]);
+
+            match kuksa_client.lock().unwrap().set_current_values(datapoints).await {
+                Ok(_) => {
+                    log::debug!("Succes setting {} to {}", vsspath, value);
+                }
+                Err(kuksa::Error::Status(status)) => {
+                    log::warn!("Error: Could not set value for VSS signal: {}, Status: {}", vsspath, &status);
+                }
+                Err(kuksa::Error::Connection(msg)) => {
+                    log::warn!("Connection Error: Could not set value for VSS signal: {}, Reason: {}", vsspath, &msg);
+                }
+                Err(kuksa::Error::Function(msg)) => {
+                    log::warn!("Error: Could not set value for VSS signal: {}, Errors: {msg:?}", vsspath);
+                }
+            };
+        }
+    }
 }
 
 

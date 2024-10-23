@@ -3,9 +3,11 @@
         "Vehicle.VehicleIdentification.VIN",
         "Vehicle.VehicleIdentification.VehicleInteriorColor"
     ],
+
     "restore-and-watch": [
         "Vehicle.Cabin.Infotainment.Media.Volume",
-        "Vehicle.Cabin.Infotainment.HMI.TemperatureUnit"
+        "Vehicle.Cabin.Infotainment.HMI.TemperatureUnit",
+        "Vehicle.Cabin.HVAC.Station.Row4.Passenger.FanSpeed"
     ],
     "state-storage": {
         "type": "file",

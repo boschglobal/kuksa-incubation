@@ -52,6 +52,7 @@ impl Storage for FileStorage {
             if let Some(v) = value {
                 return Some(v);
             }
+            log::warn!("Error reading {vsspath}, make sure all values are quoted and stored as string")
         }
         None
     }

@@ -75,6 +75,11 @@ async fn main() {
             kuksaconnector::get_from_storage_and_set(&_storage, &kuksa_client, vsspath.get::<String>().unwrap()).await;
         }
 
+        let vec: &Vec<_> = parsed["restore-and-watch"] .get().unwrap();
+        for vsspath in vec {
+            log::info!("Restoring VSS signal: {}", vsspath.get::<String>().unwrap());
+            kuksaconnector::get_from_storage_and_set(&_storage, &kuksa_client, vsspath.get::<String>().unwrap()).await;
+        }
 
 
 }
