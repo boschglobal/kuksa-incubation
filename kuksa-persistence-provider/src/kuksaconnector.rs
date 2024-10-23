@@ -29,7 +29,20 @@ pub fn create_kuksa_client(uri: &str) -> Arc<Mutex<kuksa::Client>> {
     Arc::new(Mutex::new(kuksa::Client::new(uri)))
 }
 
-pub async fn get_from_storage_and_set(storage: &impl storage::Storage, kuksa_client: &Arc<Mutex<kuksa::Client>>, vsspath: &str) {
+
+pub async fn get_from_storage_and_set_values(storage: &impl storage::Storage, kuksa_client: &Arc<Mutex<kuksa::Client>>, vsspaths: &Vec<String>) {
+    for vsspath in vsspaths {
+        get_from_storage_and_set(storage, kuksa_client, vsspath, false).await;
+    }
+}
+
+pub async fn get_from_storage_and_set_actuations(storage: &impl storage::Storage, kuksa_client: &Arc<Mutex<kuksa::Client>>, vsspaths: &Vec<String>) {
+    for vsspath in vsspaths {
+        get_from_storage_and_set(storage, kuksa_client, vsspath, true).await;
+    }
+}
+
+pub async fn get_from_storage_and_set(storage: &impl storage::Storage, kuksa_client: &Arc<Mutex<kuksa::Client>>, vsspath: &str, is_actuator: bool) {
     log::debug!("Query storage for VSS signal: {}", vsspath);
     let value = match storage.get(vsspath) {
         Some(x) => x,
@@ -89,7 +102,15 @@ pub async fn get_from_storage_and_set(storage: &impl storage::Storage, kuksa_cli
                 },
             )]);
 
-            match kuksa_client.lock().unwrap().set_current_values(datapoints).await {
+            let result = { if is_actuator {
+                kuksa_client.lock().unwrap().set_target_values(datapoints).await
+            }
+            else {
+                kuksa_client.lock().unwrap().set_current_values(datapoints).await
+            }
+        };
+
+            match result {
                 Ok(_) => {
                     log::debug!("Succes setting {} to {}", vsspath, value);
                 }

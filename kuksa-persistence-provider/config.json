@@ -1,14 +1,23 @@
 {
-    "restore-only": [
-        "Vehicle.VehicleIdentification.VIN",
-        "Vehicle.VehicleIdentification.VehicleInteriorColor"
-    ],
+    "restore-only": {
+        "values": [
+            "Vehicle.VehicleIdentification.VIN",
+            "Vehicle.VehicleIdentification.VehicleInteriorColor"
+        ],
+        "actuators": [
+            "Vehicle.Cabin.Infotainment.HMI.TemperatureUnit"
+        ]
+    },
 
-    "restore-and-watch": [
-        "Vehicle.Cabin.Infotainment.Media.Volume",
-        "Vehicle.Cabin.Infotainment.HMI.TemperatureUnit",
-        "Vehicle.Cabin.HVAC.Station.Row4.Passenger.FanSpeed"
-    ],
+    "restore-and-watch": {
+        "values": [
+            "Vehicle.Cabin.Infotainment.HMI.TemperatureUnit",
+            "Vehicle.Cabin.HVAC.Station.Row4.Passenger.FanSpeed"
+        ],
+        "actuators": [
+            "Vehicle.Cabin.Infotainment.Media.Volume"
+        ]
+    },
     "state-storage": {
         "type": "file",
         "path": "statestore.json"

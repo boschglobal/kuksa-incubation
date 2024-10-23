@@ -7,6 +7,7 @@ This provider can achieve this.
 ## Configuration: config,json
 
 Main confiuguration is in config.json, and example may look like this
+
 ```json
 {
     "restore-only": [
@@ -29,10 +30,9 @@ Main confiuguration is in config.json, and example may look like this
 
 These elements will be restored from the state store upon startup, but their values will not be watched and updated for changes.
 
-
 ## restore-and-watch
 
-These elements will be restored from the state store upon startup. It is the intention to also monitor their state and update it in the state store. **This is currently not implemented** 
+These elements will be restored from the state store upon startup. It is the intention to also monitor their state and update it in the state store. **This is currently not implemented**
 
 ## state-storage
 

@@ -11,5 +11,8 @@
     },
     "Vehicle.Cabin.HVAC.Station.Row4.Passenger.FanSpeed": {
         "value": "50"
+    },
+    "LOL": {
+        "value": "LOL"
     }
 }
